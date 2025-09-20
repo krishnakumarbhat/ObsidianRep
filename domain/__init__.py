@@ -1,0 +1,1 @@
+# Domain layer - contains business entities and value objects

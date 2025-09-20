@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-wheel-metadata/
+.installed.cfg
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.env.*
+instance/
+
+# Node.js
+node_modules/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+chroma_db/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo

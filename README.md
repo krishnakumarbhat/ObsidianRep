@@ -75,3 +75,47 @@ Recall is a Q&A application that uses a local large language model to answer que
 1.  **Ingestion:** The `ingest.py` script reads your markdown files, splits them into chunks, generates embeddings using Ollama, and stores them in a ChromaDB vector store.
 2.  **Watching:** The `watcher.py` script monitors the `data` directory for changes and automatically runs the `ingest.py` script when a file is added, modified, or deleted.
 3.  **Application:** The `run.py` script starts a Flask web server that provides a Q&A interface. When you ask a question, the application uses the RAG pipeline to retrieve relevant documents from the vector store, combines them with your question, and uses Ollama to generate an answer.
+
+
+modules = ["nodejs-20", "web", "postgresql-16"]
+run = "npm run dev"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[env]
+PORT = "5000"
+
+[agent]
+integrations = ["javascript_mem_db:1.0.0", "javascript_openai:1.0.0"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
