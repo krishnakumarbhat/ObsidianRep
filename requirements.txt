@@ -1,0 +1,8 @@
+Flask
+langchain
+langchain-community
+ollama
+python-dotenv
+watchdog
+chromadb
+unstructured

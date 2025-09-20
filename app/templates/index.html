@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MD Knowledge Base Q&A</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; background-color: #f0f2f5; }
+        .container { max-width: 800px; margin: auto; padding: 2em; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        form { display: flex; flex-direction: column; }
+        input[type="text"] { padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1em; }
+        input[type="submit"] { padding: 10px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        input[type="submit"]:hover { background-color: #0056b3; }
+        .result { margin-top: 2em; padding: 1em; background-color: #e9ecef; border-radius: 4px; }
+        .result h2 { margin-top: 0; }
+        .sources { font-size: 0.9em; color: #555; margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Ask Your Documents</h1>
+        <form method="post">
+            <input type="text" name="query" placeholder="Ask a question about your markdown files..." value="{{ query or '' }}">
+            <input type="submit" value="Search">
+        </form>
+        {% if answer %}
+        <div class="result">
+            <h2>Answer</h2>
+            <p>{{ answer }}</p>
+            {% if sources %}
+            <div class="sources">
+                <h3>Sources:</h3>
+                <ul>
+                    {% for source in sources.split('\n') %}
+                    <li>{{ source }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
