@@ -1,121 +1,318 @@
+# RecallMind - AI-Powered Study Assistant
 
-# Recall
+RecallMind is a comprehensive Python-based study assistant that adapts the functionality of the Node.js RecallMind application. It provides AI-powered Q&A capabilities, flashcard management, study sessions, and quiz generation using a clean, SOLID-principle-based architecture.
 
-Recall is a Q&A application that uses a local large language model to answer questions about your markdown files. It uses LangChain, Ollama, and ChromaDB to create a retrieval-augmented generation (RAG) pipeline.
+## 🏗️ Architecture
 
-## Project Structure
+The application follows **SOLID principles** and implements several design patterns:
+
+### Core Principles
+- **Single Responsibility Principle**: Each class has one reason to change
+- **Open/Closed Principle**: Open for extension, closed for modification
+- **Liskov Substitution Principle**: Derived classes are substitutable for base classes
+- **Interface Segregation Principle**: Clients depend only on interfaces they use
+- **Dependency Inversion Principle**: Depend on abstractions, not concretions
+
+### Design Patterns
+- **Repository Pattern**: Data access abstraction
+- **Service Layer Pattern**: Business logic encapsulation
+- **Factory Pattern**: Application and service creation
+- **Dependency Injection**: Loose coupling between components
+
+## 📁 Project Structure
 
 ```
-.env
-/recall
-|-- app/
-|   |-- __init__.py
-|   |-- routes.py
-|   |-- services.py
-|   `-- templates/
-|       `-- index.html
-|-- scripts/
-|   |-- ingest.py
-|   `-- watcher.py
-|-- chroma_db/
-|-- data/
-|-- config.py
-|-- requirements.txt
-`-- run.py
+RecallMind/
+├── domain/                     # Domain layer - business entities
+│   ├── __init__.py
+│   ├── entities.py            # Core business entities
+│   └── value_objects.py       # Value objects
+├── repositories/              # Repository layer - data access
+│   ├── __init__.py
+│   ├── interfaces.py          # Repository interfaces
+│   ├── memory_repository.py   # In-memory implementations
+│   └── vector_repository.py   # Vector database implementation
+├── services/                  # Service layer - business logic
+│   ├── __init__.py
+│   ├── deck_service.py        # Deck management
+│   ├── flashcard_service.py   # Flashcard management
+│   ├── study_service.py       # Study sessions
+│   ├── test_service.py        # Quiz and tests
+│   ├── ai_service.py          # AI-powered features
+│   └── initialization_service.py  # App initialization
+├── app/                      # Application layer - API
+│   ├── __init__.py           # Flask app factory
+│   ├── routes.py             # Main API routes
+│   ├── flashcard_routes.py   # Flashcard endpoints
+│   ├── study_routes.py       # Study session endpoints
+│   └── ai_routes.py          # AI endpoints
+├── data/                     # Data directory for markdown files
+├── chroma_db/               # Vector database storage
+├── config.py                # Configuration settings
+├── requirements.txt         # Python dependencies
+├── run.py                   # Application entry point
+└── README.md               # This file
 ```
 
-## Setup
+## 🚀 Features
 
-1. **Install dependencies:**
+### Core Features
+- **Flashcard Management**: Create, organize, and manage study decks
+- **AI-Powered Q&A**: Ask questions about your study materials using RAG
+- **Study Sessions**: Track learning progress with detailed analytics
+- **Quiz Generation**: AI-generated multiple-choice questions
+- **Vector Search**: Semantic search through your study materials
+- **Automatic Data Ingestion**: Processes markdown files on startup
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Technical Features
+- **RESTful API**: Complete REST API with proper HTTP status codes
+- **Async Support**: Asynchronous operations for better performance
+- **Error Handling**: Comprehensive error handling and validation
+- **Data Validation**: Input validation using domain models
+- **Modular Design**: Clean separation of concerns
 
-2. **Set up Ollama:**
+## 🛠️ Installation & Setup
 
-   - Install and run Ollama.
-   - Pull the models you want to use, for example:
+### Prerequisites
+- Python 3.8+
+- Ollama (for AI models)
+- Git
 
-     ```bash
-     ollama pull llama2:7b
-     ollama pull nomic-embed-text:latest
-     ```
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd RecallMind
+```
 
-3. **Add your documents:**
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-   - Place your markdown files in the `data` directory.
+### 3. Set Up Ollama
+Install and run Ollama, then pull the required models:
 
-4. **Ingest your documents:**
+```bash
+# Install Ollama (visit https://ollama.ai for installation instructions)
+ollama pull nomic-embed-text:latest
+ollama pull deepseek-r1:latest
+```
 
-   - Run the ingest script to process your documents and create a vector store:
+### 4. Configure Data Directory
+Update `config.py` to point to your markdown files directory:
 
-     ```bash
-     python scripts/ingest.py
-     ```
+```python
+DATA_DIRECTORY = "/path/to/your/study/materials"
+```
 
-5. **Run the application:**
+### 5. Run the Application
+```bash
+python run.py
+```
 
-   ```bash
-   python run.py
-   ```
+The application will be available at `http://localhost:5000`
 
-   The application will be available at `http://127.0.0.1:5000`.
+## 📚 API Documentation
 
-6. **(Optional) Watch for changes:**
+### Health Check
+```http
+GET /api/health
+```
 
-   - To automatically re-ingest your documents when they change, run the watcher script:
+### Deck Management
+```http
+GET    /api/decks              # Get all decks
+GET    /api/decks/{id}         # Get specific deck
+POST   /api/decks              # Create new deck
+PUT    /api/decks/{id}         # Update deck
+DELETE /api/decks/{id}         # Delete deck
+```
 
-     ```bash
-     python scripts/watcher.py
-     ```
+### Flashcard Management
+```http
+GET    /api/decks/{id}/flashcards    # Get deck flashcards
+POST   /api/flashcards               # Create flashcard
+PUT    /api/flashcards/{id}          # Update flashcard
+DELETE /api/flashcards/{id}          # Delete flashcard
+```
 
-## How It Works
+### Study Sessions
+```http
+POST   /api/study-sessions                    # Start study session
+PUT    /api/study-sessions/{id}               # End study session
+POST   /api/card-reviews                      # Record card review
+GET    /api/study-sessions/{id}/progress      # Get study progress
+```
 
-1.  **Ingestion:** The `ingest.py` script reads your markdown files, splits them into chunks, generates embeddings using Ollama, and stores them in a ChromaDB vector store.
-2.  **Watching:** The `watcher.py` script monitors the `data` directory for changes and automatically runs the `ingest.py` script when a file is added, modified, or deleted.
-3.  **Application:** The `run.py` script starts a Flask web server that provides a Q&A interface. When you ask a question, the application uses the RAG pipeline to retrieve relevant documents from the vector store, combines them with your question, and uses Ollama to generate an answer.
+### AI Features
+```http
+POST   /api/chat/ask                    # Ask AI question
+GET    /api/chat/messages               # Get chat history
+POST   /api/quiz/generate/{deck_id}     # Generate quiz question
+```
 
+### User Statistics
+```http
+GET    /api/stats              # Get user statistics
+PUT    /api/stats              # Update user statistics
+```
 
-modules = ["nodejs-20", "web", "postgresql-16"]
-run = "npm run dev"
-hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+### Data Management
+```http
+POST   /api/data/reingest      # Re-ingest all data
+```
 
-[nix]
-channel = "stable-24_05"
+## 🔧 Configuration
 
-[deployment]
-deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+### Environment Variables
+Create a `.env` file in the project root:
 
-[[ports]]
-localPort = 5000
-externalPort = 80
+```env
+FLASK_ENV=development
+FLASK_DEBUG=True
+DATA_DIRECTORY=/path/to/your/data
+CHROMA_PERSIST_DIRECTORY=chroma_db
+EMBEDDING_MODEL=nomic-embed-text:latest
+LLM_MODEL=deepseek-r1:latest
+```
 
-[env]
-PORT = "5000"
+### Configuration Options
+Edit `config.py` to customize:
 
-[agent]
-integrations = ["javascript_mem_db:1.0.0", "javascript_openai:1.0.0"]
+- **Data Directory**: Where your markdown files are stored
+- **Vector Database**: ChromaDB storage location
+- **AI Models**: Ollama model names
+- **API Settings**: Port, host, and other API configurations
 
-[workflows]
-runButton = "Project"
+## 📖 Usage Examples
 
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
+### Creating a Deck
+```python
+import requests
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start application"
+# Create a new deck
+response = requests.post('http://localhost:5000/api/decks', json={
+    'name': 'Python Programming',
+    'description': 'Basic Python concepts',
+    'difficulty': 'beginner'
+})
+deck = response.json()
+```
 
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
+### Adding Flashcards
+```python
+# Add a flashcard to the deck
+response = requests.post('http://localhost:5000/api/flashcards', json={
+    'deck_id': deck['id'],
+    'question': 'What is a variable in Python?',
+    'answer': 'A variable is a container for storing data values.'
+})
+```
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
+### Starting a Study Session
+```python
+# Start studying
+response = requests.post('http://localhost:5000/api/study-sessions', json={
+    'deck_id': deck['id']
+})
+session = response.json()
+```
+
+### Asking AI Questions
+```python
+# Ask the AI about your study materials
+response = requests.post('http://localhost:5000/api/chat/ask', json={
+    'question': 'Explain Python data types'
+})
+answer = response.json()
+```
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+# Install test dependencies
+pip install pytest pytest-asyncio
+
+# Run tests
+pytest tests/
+```
+
+### API Testing
+Use tools like Postman or curl to test the API:
+
+```bash
+# Health check
+curl http://localhost:5000/api/health
+
+# Get all decks
+curl http://localhost:5000/api/decks
+
+# Create a deck
+curl -X POST http://localhost:5000/api/decks \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test Deck", "difficulty": "beginner"}'
+```
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **Ollama Connection Error**
+   - Ensure Ollama is running: `ollama serve`
+   - Check if models are installed: `ollama list`
+
+2. **Vector Database Issues**
+   - Delete `chroma_db` folder to reset
+   - Check data directory permissions
+
+3. **Import Errors**
+   - Ensure all dependencies are installed: `pip install -r requirements.txt`
+   - Check Python version compatibility
+
+4. **Data Ingestion Fails**
+   - Verify data directory exists and contains `.md` files
+   - Check file permissions and encoding
+
+### Debug Mode
+Enable debug mode in `config.py`:
+
+```python
+DEBUG = True
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes following SOLID principles
+4. Add tests for new functionality
+5. Submit a pull request
+
+### Code Style
+- Follow PEP 8 guidelines
+- Use type hints where possible
+- Write comprehensive docstrings
+- Maintain SOLID principles
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by the original RecallMind Node.js application
+- Built with Flask, LangChain, and ChromaDB
+- AI capabilities powered by Ollama
+
+## 📞 Support
+
+For issues and questions:
+1. Check the troubleshooting section
+2. Review the API documentation
+3. Open an issue on GitHub
+4. Check the logs for error details
+
+---
+
+**RecallMind** - Empowering learning through AI and clean architecture! 🚀

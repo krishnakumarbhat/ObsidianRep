@@ -104,6 +104,10 @@ class MemoryStudySessionRepository(IStudySessionRepository):
             if hasattr(session, key):
                 setattr(session, key, value)
         return session
+    
+    async def get_by_id(self, session_id: str) -> Optional[StudySession]:
+        """Get study session by ID."""
+        return self._sessions.get(session_id)
 
 
 class MemoryCardReviewRepository(ICardReviewRepository):
@@ -133,6 +137,21 @@ class MemoryTestRepository(ITestRepository):
     
     async def get_by_deck_id(self, deck_id: str) -> List[Test]:
         return [test for test in self._tests.values() if test.deck_id == deck_id]
+    
+    async def get_by_id(self, test_id: str) -> Optional[Test]:
+        """Get test by ID."""
+        return self._tests.get(test_id)
+    
+    async def update(self, test_id: str, test_data: dict) -> Optional[Test]:
+        """Update test."""
+        if test_id not in self._tests:
+            return None
+        
+        test = self._tests[test_id]
+        for key, value in test_data.items():
+            if hasattr(test, key):
+                setattr(test, key, value)
+        return test
 
 
 class MemoryChatMessageRepository(IChatMessageRepository):
