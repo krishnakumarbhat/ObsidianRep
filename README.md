@@ -1,12 +1,30 @@
 # RecallMind - AI-Powered Study Assistant
 
+[![CI](https://github.com/krishnakumarbhat/ObsidianRep/actions/workflows/ci.yml/badge.svg)](https://github.com/krishnakumarbhat/ObsidianRep/actions/workflows/ci.yml)
+
 RecallMind is a comprehensive Python-based study assistant that adapts the functionality of the Node.js RecallMind application. It provides AI-powered Q&A capabilities, flashcard management, study sessions, and quiz generation using a clean, SOLID-principle-based architecture.
 
 ## 🏗️ Architecture
 
+```mermaid
+flowchart TD
+    U[User / Client] -->|REST API| F[Flask App]
+    F --> R[Routes Layer]
+    R --> S[Service Layer]
+    S --> REPO[Repository Layer]
+    REPO --> MEM[In-Memory Store]
+    REPO --> VEC[ChromaDB Vector Store]
+    S --> AI[AI Service - Ollama]
+    AI -->|Embeddings| VEC
+    AI -->|LLM Inference| OLL[Ollama Server]
+    S --> DOMAIN[Domain Entities]
+    MD[Markdown Files] -->|Ingestion| VEC
+```
+
 The application follows **SOLID principles** and implements several design patterns:
 
 ### Core Principles
+
 - **Single Responsibility Principle**: Each class has one reason to change
 - **Open/Closed Principle**: Open for extension, closed for modification
 - **Liskov Substitution Principle**: Derived classes are substitutable for base classes
@@ -14,6 +32,7 @@ The application follows **SOLID principles** and implements several design patte
 - **Dependency Inversion Principle**: Depend on abstractions, not concretions
 
 ### Design Patterns
+
 - **Repository Pattern**: Data access abstraction
 - **Service Layer Pattern**: Business logic encapsulation
 - **Factory Pattern**: Application and service creation
@@ -57,6 +76,7 @@ RecallMind/
 ## 🚀 Features
 
 ### Core Features
+
 - **Flashcard Management**: Create, organize, and manage study decks
 - **AI-Powered Q&A**: Ask questions about your study materials using RAG
 - **Study Sessions**: Track learning progress with detailed analytics
@@ -65,6 +85,7 @@ RecallMind/
 - **Automatic Data Ingestion**: Processes markdown files on startup
 
 ### Technical Features
+
 - **RESTful API**: Complete REST API with proper HTTP status codes
 - **Async Support**: Asynchronous operations for better performance
 - **Error Handling**: Comprehensive error handling and validation
@@ -74,22 +95,26 @@ RecallMind/
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
+
 - Python 3.8+
 - Ollama (for AI models)
 - Git
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd RecallMind
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Set Up Ollama
+
 Install and run Ollama, then pull the required models:
 
 ```bash
@@ -99,6 +124,7 @@ ollama pull deepseek-r1:latest
 ```
 
 ### 4. Configure Data Directory
+
 Update `config.py` to point to your markdown files directory:
 
 ```python
@@ -106,6 +132,7 @@ DATA_DIRECTORY = "/path/to/your/study/materials"
 ```
 
 ### 5. Run the Application
+
 ```bash
 python run.py
 ```
@@ -115,11 +142,13 @@ The application will be available at `http://localhost:5000`
 ## 📚 API Documentation
 
 ### Health Check
+
 ```http
 GET /api/health
 ```
 
 ### Deck Management
+
 ```http
 GET    /api/decks              # Get all decks
 GET    /api/decks/{id}         # Get specific deck
@@ -129,6 +158,7 @@ DELETE /api/decks/{id}         # Delete deck
 ```
 
 ### Flashcard Management
+
 ```http
 GET    /api/decks/{id}/flashcards    # Get deck flashcards
 POST   /api/flashcards               # Create flashcard
@@ -137,6 +167,7 @@ DELETE /api/flashcards/{id}          # Delete flashcard
 ```
 
 ### Study Sessions
+
 ```http
 POST   /api/study-sessions                    # Start study session
 PUT    /api/study-sessions/{id}               # End study session
@@ -145,6 +176,7 @@ GET    /api/study-sessions/{id}/progress      # Get study progress
 ```
 
 ### AI Features
+
 ```http
 POST   /api/chat/ask                    # Ask AI question
 GET    /api/chat/messages               # Get chat history
@@ -152,12 +184,14 @@ POST   /api/quiz/generate/{deck_id}     # Generate quiz question
 ```
 
 ### User Statistics
+
 ```http
 GET    /api/stats              # Get user statistics
 PUT    /api/stats              # Update user statistics
 ```
 
 ### Data Management
+
 ```http
 POST   /api/data/reingest      # Re-ingest all data
 ```
@@ -165,6 +199,7 @@ POST   /api/data/reingest      # Re-ingest all data
 ## 🔧 Configuration
 
 ### Environment Variables
+
 Create a `.env` file in the project root:
 
 ```env
@@ -177,6 +212,7 @@ LLM_MODEL=deepseek-r1:latest
 ```
 
 ### Configuration Options
+
 Edit `config.py` to customize:
 
 - **Data Directory**: Where your markdown files are stored
@@ -187,6 +223,7 @@ Edit `config.py` to customize:
 ## 📖 Usage Examples
 
 ### Creating a Deck
+
 ```python
 import requests
 
@@ -200,6 +237,7 @@ deck = response.json()
 ```
 
 ### Adding Flashcards
+
 ```python
 # Add a flashcard to the deck
 response = requests.post('http://localhost:5000/api/flashcards', json={
@@ -210,6 +248,7 @@ response = requests.post('http://localhost:5000/api/flashcards', json={
 ```
 
 ### Starting a Study Session
+
 ```python
 # Start studying
 response = requests.post('http://localhost:5000/api/study-sessions', json={
@@ -219,6 +258,7 @@ session = response.json()
 ```
 
 ### Asking AI Questions
+
 ```python
 # Ask the AI about your study materials
 response = requests.post('http://localhost:5000/api/chat/ask', json={
@@ -230,6 +270,7 @@ answer = response.json()
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Install test dependencies
 pip install pytest pytest-asyncio
@@ -239,6 +280,7 @@ pytest tests/
 ```
 
 ### API Testing
+
 Use tools like Postman or curl to test the API:
 
 ```bash
@@ -275,6 +317,7 @@ curl -X POST http://localhost:5000/api/decks \
    - Check file permissions and encoding
 
 ### Debug Mode
+
 Enable debug mode in `config.py`:
 
 ```python
@@ -290,6 +333,7 @@ DEBUG = True
 5. Submit a pull request
 
 ### Code Style
+
 - Follow PEP 8 guidelines
 - Use type hints where possible
 - Write comprehensive docstrings
@@ -308,6 +352,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 📞 Support
 
 For issues and questions:
+
 1. Check the troubleshooting section
 2. Review the API documentation
 3. Open an issue on GitHub
